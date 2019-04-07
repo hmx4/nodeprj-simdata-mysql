@@ -28,15 +28,16 @@
 					function(data){
 						$('#RoomTemp').val(data[0].temperature);
 						$('#RoomHumid').val(data[0].humidity);
-						
+						// 將取出的最新10筆資料重新依照較舊data[0]到較新data[9]排序
+						var length = data.length;
 						var tempa = new Array();					
-						var humida = new Array();
-						
-						for (i=0; i< data.length; i++)
+						var humida = new Array();				
+						for (i=0; i< length; i++)
 						{	
-							tempa[i] = Number(data[i].temperature);
-							humida[i]= Number(data[i].humidity);	
+							tempa[i] = Number(data[length-i-1].temperature);
+							humida[i]= Number(data[length-i-1].humidity);	
 						}
+						// 呼叫hichart繪製曲線圖函數，傳入溫度值陣列及濕度值陣列
 						plotcharts(tempa, humida);
 					}
 				);
@@ -48,6 +49,7 @@
 				window.location.href = '/';
 			});	
 			
+			// 此為hichart提供的繪製曲線圖函數，參數為溫度值陣列及濕度值陣列
 			function plotcharts(tempa, humida)
 			{
 				// 繪製Highcharts圖測試
