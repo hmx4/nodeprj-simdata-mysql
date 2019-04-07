@@ -1,0 +1,141 @@
+<!DOCTYPE html> <!-- !DOCTYPE html是宣告這個網頁是基於HTML5所寫的 -->
+<html> <!-- html為網頁的起始標籤，其內包含了表頭head及內容body兩部分 -->
+<!---->
+<!-- head為網頁的表頭，通常將CSS、引用bootstrap、jquery等meta data，以及javascript函數放在表頭內 -->
+<!---->
+<head> 
+	<title>遠端監控服務</title> <!-- 網頁標題 -->
+	<!-- 以下這5行是引用bootstrap及jquery CDN (Content Delivery Network)的標準動作 -->
+	<meta charset="utf-8"> <!-- 指定內文的編碼，若要顯示中文，通常用utf-8這個unicode編碼 -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+	<!-- 以下是引用Hightcharts之CDN -->
+	<script src="https://code.highcharts.com/highcharts.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
+	
+	<!-- 以下這個匿名函數是jquery的ready事件處理方法，當網頁Ready好的就會自動執行 -->
+	<!-- 因此，可以把要註冊的所有事件處理函數及需要先執行的命令放在這個函數內 -->
+	<script>
+		$(function(){
+			
+			// 幫id為btn1的按鈕標籤註冊了點擊事件的處理方法
+			$('#btn1').click(function(){
+				$.post(
+					'/save_retrieve_thdata',
+					function(data){
+						$('#RoomTemp').val(data[0].temperature);
+						$('#RoomHumid').val(data[0].humidity);
+						
+						var tempa = new Array();					
+						var humida = new Array();
+						
+						for (i=0; i< data.length; i++)
+						{	
+							tempa[i] = Number(data[i].temperature);
+							humida[i]= Number(data[i].humidity);	
+						}
+						plotcharts(tempa, humida);
+					}
+				);
+			});
+			
+			
+			// 幫id為btn2的按鈕標籤註冊了點擊事件的處理方法
+			$('#btn2').click(function(){
+				window.location.href = '/';
+			});	
+			
+			function plotcharts(tempa, humida)
+			{
+				// 繪製Highcharts圖測試
+				Highcharts.chart('container', {
+					chart: {
+						type: 'line'
+					},
+					legend: {
+						itemStyle: {
+							font: '18pt 標楷體',
+							color: '#222'
+						},
+						itemHoverStyle: {
+							color: 'red'
+						},
+						itemHiddenStyle: {
+							color: '#444'
+						}
+					},
+					title: {
+						text: '最近10筆溫度及濕度',
+						style: {color:'red', fontSize: '20px', fontFamily: '標楷體'}
+					},
+					
+					xAxis: {
+						categories: ['第1筆', '第2筆', '第3筆', '第4筆', '第5筆', '第6筆', '第7筆', '第8筆', '第9筆', '第10筆'],
+						labels: {
+							style: {color:'green', fontSize: '20px', fontFamily: '標楷體'}
+						}
+					},
+					yAxis: {
+						title: {
+							text: '溫度(°C) 濕度(%)',
+							style: {color:'blue', fontSize: '20px', fontFamily: '標楷體'}
+						}
+					},
+					plotOptions: {
+						line: {
+							dataLabels: {
+								enabled: true
+							},
+							enableMouseTracking: true
+						}
+					},
+					series: [{
+						name: '溫度',
+						style: {fontSize: '16px', fontFamily: '標楷體'},
+						data: tempa
+					}, {
+						name: '濕度',
+						style: {fontSize: '16px', fontFamily: '標楷體'},
+						data: humida
+					}]
+				});
+			}
+			//
+		})
+	</script>
+	
+	<style>
+		input {font-size:12px}
+	</style>
+</head>
+<!---->
+<!-- body為網頁的內容，也就是呈現使用者介面UI的地方 -->
+<!---->
+<body class="bg-warning">
+<div class="container">
+
+	<!-- 讀取溫、濕度(DHT11) UI -->
+	<center>
+		<h2 class="bg-primary"><b>儲存與顯示室內即時溫、濕度值(DHT11)</b></h2>
+		<h3>
+		<button id="btn1" class="btn btn-success btn-md"><b>顯示即時溫濕度</b></button>
+		<b class="text-primary">溫度(°C):</b> <input type="text" size="10" id="RoomTemp">
+		<b class="text-primary">溼度(%):</b> <input type="text" size="10" id="RoomHumid"> <br/>
+		<br/>
+		</h3>
+	</center>
+	
+	<!-- 回首頁按鈕 -->
+	<center>
+	<h3>
+		<button id="btn2" class="btn btn-info btn-sm"><b>回首頁</b></button> <br/>
+	</h3>
+	<div id="container" style="min-width: 310px; height: 320px; margin: 0 auto"></div>
+	
+	</center>
+
+</body>
+</html>
